@@ -25,7 +25,8 @@ USE WideWorldImporters;
 Таблицы: Warehouse.StockItems.
 */
 
--- напишите здесь свое решение
+select StockItemID, StockItemName from Warehouse.StockItems
+where StockItemName like '%urgent%' or StockItemName like 'Animal%'
 
 /*
 2. Поставщиков (Suppliers), у которых не было сделано ни одного заказа (PurchaseOrders).
@@ -36,7 +37,10 @@ USE WideWorldImporters;
 По каким колонкам делать JOIN подумайте самостоятельно.
 */
 
--- напишите здесь свое решение
+select s.SupplierID, SupplierName from Purchasing.Suppliers as s
+left join Purchasing.PurchaseOrders as p on s.SupplierID = p.SupplierID
+group by s.SupplierID, SupplierName
+having count(p.SupplierID) = 0
 
 /*
 3. Заказы (Orders) с товарами ценой (UnitPrice) более 100$
@@ -58,7 +62,14 @@ USE WideWorldImporters;
 Таблицы: Sales.Orders, Sales.OrderLines, Sales.Customers.
 */
 
--- напишите здесь свое решение
+select o.OrderID, OrderDate, DATENAME(MONTH, OrderDate) as month, 
+DATEPART(QUARTER, OrderDate) as quarter, (DATEPART(MONTH, OrderDate)-1)/4 + 1 as [треть года],
+CustomerName from Sales.Orders as o
+left join Sales.OrderLines as l on o.OrderID = l.OrderID
+left join Sales.Customers as c on c.CustomerID = o.CustomerID
+where (UnitPrice > 100 or Quantity > 20) and o.PickingCompletedWhen is not null
+order by quarter, [треть года], OrderDate
+OFFSET 1000 ROWS FETCH FIRST 100 ROWS ONLY;
 
 /*
 4. Заказы поставщикам (Purchasing.Suppliers),
@@ -75,7 +86,11 @@ USE WideWorldImporters;
 Таблицы: Purchasing.Suppliers, Purchasing.PurchaseOrders, Application.DeliveryMethods, Application.People.
 */
 
--- напишите здесь свое решение
+select d.DeliveryMethodName, ExpectedDeliveryDate, SupplierName, PreferredName from Purchasing.PurchaseOrders as p
+left join Purchasing.Suppliers as s on p.SupplierID = s.SupplierID
+left join Application.DeliveryMethods as d on s.DeliveryMethodID = d.DeliveryMethodID
+left join Application.People as pe on p.ContactPersonID = pe.PersonID
+
 
 /*
 5. Десять последних продаж (по дате продажи - InvoiceDate) с именем клиента (клиент - CustomerID) и именем сотрудника,
@@ -86,7 +101,10 @@ USE WideWorldImporters;
 Таблицы: Sales.Invoices, Sales.Customers, Application.People.
 */
 
--- напишите здесь свое решение
+select TOP(10) InvoiceID, InvoiceDate, CustomerName, FullName from Sales.Invoices as i
+left join Sales.Customers as c on i.CustomerID = c.CustomerID
+left join Application.People as p on p.PersonID = i.SalespersonPersonID
+order by InvoiceID desc
 
 /*
 6. Все ид и имена клиентов (клиент - CustomerID) и их контактные телефоны (PhoneNumber),
@@ -96,4 +114,8 @@ USE WideWorldImporters;
 Таблицы: Sales.Invoices, Sales.InvoiceLines, Sales.Customers, Warehouse.StockItems.
 */
 
--- напишите здесь свое решение
+select i.CustomerID, CustomerName, PhoneNumber  from Sales.InvoiceLines as l
+left join Sales.Invoices as i on l.InvoiceID = i.InvoiceID
+left join Warehouse.StockItems as s on l.StockItemID = s.StockItemID
+left join Sales.Customers as c on i.CustomerID = c.CustomerID
+where StockItemName = 'Chocolate frogs 250g'
