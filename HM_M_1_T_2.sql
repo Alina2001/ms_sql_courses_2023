@@ -38,9 +38,9 @@ where StockItemName like '%urgent%' or StockItemName like 'Animal%'
 */
 
 select s.SupplierID, SupplierName from Purchasing.Suppliers as s
-left join Purchasing.PurchaseOrders as p on s.SupplierID = p.SupplierID
-group by s.SupplierID, SupplierName
-having count(p.SupplierID) = 0
+full join Purchasing.PurchaseOrders as p on s.SupplierID = p.SupplierID
+where PurchaseOrderID is Null
+
 
 /*
 3. Заказы (Orders) с товарами ценой (UnitPrice) более 100$
@@ -62,7 +62,7 @@ having count(p.SupplierID) = 0
 Таблицы: Sales.Orders, Sales.OrderLines, Sales.Customers.
 */
 
-select o.OrderID, OrderDate, DATENAME(MONTH, OrderDate) as month, 
+select o.OrderID, FORMAT(OrderDate, 'dd.MM.yyyy') as date, DATENAME(MONTH, OrderDate) as month, 
 DATEPART(QUARTER, OrderDate) as quarter, (DATEPART(MONTH, OrderDate)-1)/4 + 1 as [треть года],
 CustomerName from Sales.Orders as o
 left join Sales.OrderLines as l on o.OrderID = l.OrderID
@@ -86,10 +86,14 @@ OFFSET 1000 ROWS FETCH FIRST 100 ROWS ONLY;
 Таблицы: Purchasing.Suppliers, Purchasing.PurchaseOrders, Application.DeliveryMethods, Application.People.
 */
 
-select d.DeliveryMethodName, ExpectedDeliveryDate, SupplierName, PreferredName from Purchasing.PurchaseOrders as p
+select d.DeliveryMethodName, ExpectedDeliveryDate, SupplierName, PreferredName, IsOrderFinalized from Purchasing.PurchaseOrders as p
 left join Purchasing.Suppliers as s on p.SupplierID = s.SupplierID
 left join Application.DeliveryMethods as d on s.DeliveryMethodID = d.DeliveryMethodID
 left join Application.People as pe on p.ContactPersonID = pe.PersonID
+where ExpectedDeliveryDate >= '2013-01-01' and ExpectedDeliveryDate <= '2013-01-31' 
+and (d.DeliveryMethodName = 'Air Freight' or d.DeliveryMethodName = 'Refrigerated Air Freight')
+and IsOrderFinalized = 1
+order by ExpectedDeliveryDate 
 
 
 /*
