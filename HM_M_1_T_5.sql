@@ -1,6 +1,6 @@
 /* Выберите сотрудников (Application.People), 
 которые являются продажниками (IsSalesPerson), 
-и не сделали ни одной продажи 04 июля 2015 года. 
+и не сделали ни одной продажи 04 июля 2013 года. 
 Вывести ИД сотрудника и его полное имя. 
 Продажи смотреть в таблице Sales.Invoices.
 */
@@ -26,10 +26,13 @@ where IsSalesperson = 1 and PersonID is null
 Вывести: ИД товара, наименование товара, цена.
 */
 
-select distinct StockItemID, Description, UnitPrice
-from Sales.OrderLines
-where UnitPrice = (select min(UnitPrice) as min from Sales.OrderLines)
+select distinct so.StockItemID, StockItemName, so.UnitPrice
+from Sales.OrderLines as so
+join Warehouse.StockItems as ws
+on ws.stockItemID = so.StockItemID
+where so.UnitPrice = (select min(UnitPrice) as min from Sales.OrderLines)
 
+select * from Warehouse.StockItems
 
 /*
 Выберите информацию по клиентам, 
