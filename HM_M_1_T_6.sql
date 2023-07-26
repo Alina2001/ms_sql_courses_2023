@@ -112,8 +112,11 @@ order by month, numberPopular
 */
 
 select *,
-count(FirstLetter) over (order by FirstLetter Range between unbounded preceding and current row) as next,
-count(FirstLetter) over (order by FirstLetter desc Range between current row and unbounded following) as last
+LEAD(FirstLetter) over (order by FirstLetter, StockItemName) as next,
+LAG(FirstLetter) over (order by FirstLetter, StockItemName ) as last,
+first_value(StockItemName) over (order by FirstLetter, StockItemName rows between 2 preceding and current row) 
+as name_2_ago,
+NTILE(30) over (order by FirstLetter, StockItemName) as group_
 from 
 (
 	select StockItemID, StockItemName, Brand, UnitPrice,
@@ -123,7 +126,7 @@ from
 	as AllSameLetter
 	from Warehouse.StockItems
 ) qwe
-order by FirstLetter
+order by FirstLetter, StockItemName
 
 /*
 5. По каждому сотруднику выведите последнего клиента, которому сотрудник что-то продал.
