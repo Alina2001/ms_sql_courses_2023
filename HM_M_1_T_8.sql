@@ -137,7 +137,7 @@ where o.StockItemName not in (select StockItemName COLLATE Cyrillic_General_CI_A
 */
 
 Select * from Warehouse.StockItems
-for xml auto
+for xml path('Item'), ROOT('StockItems')
 
 /*
 3. В таблице Warehouse.StockItems в колонке CustomFields есть данные в JSON.
@@ -150,12 +150,8 @@ for xml auto
 
 select StockItemID, 
 StockItemName,
-(select json_value(wsi.CustomFields, '$.CountryOfManufacture') from
-Warehouse.StockItems as wsi
-where wsi.StockItemID = si.StockItemID) as CountryOfManufacture,
-(select json_value(wsi.CustomFields, '$.Tags[0]') from
-Warehouse.StockItems as wsi
-where wsi.StockItemID = si.StockItemID) as FirstTag
+json_value(CustomFields, '$.CountryOfManufacture') as CountryOfManufacture,
+json_value(wsi.CustomFields, '$.Tags[0]') as FirstTag
 from Warehouse.StockItems as si
 
 
@@ -178,5 +174,8 @@ from Warehouse.StockItems as si
 ... where ... CustomFields like '%Vintage%' 
 */
 
-select StockItemID, StockItemName, json_query(CustomFields, '$.Tags') from Warehouse.StockItems
-where json_value(CustomFields, '$.Tags[0]') = 'Vintage' or json_value(CustomFields, '$.Tags[1]') = 'Vintage' or json_value(CustomFields, '$.Tags[2]') = 'Vintage' 
+select si.StockItemID, si.StockItemName, json_query(si.CustomFields, '$.Tags') from Warehouse.StockItems as si
+where EXists(select Tags.value from Warehouse.StockItems as wsi
+cross apply openjson(wsi.CustomFields, '$.Tags') Tags
+where wsi.StockItemName = si.StockItemName and Tags.value = 'Vintage')
+
