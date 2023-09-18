@@ -47,23 +47,27 @@ DECLARE @ColumnName_add AS NVARCHAR(MAX)
  
 SELECT @ColumnName= ISNULL(@ColumnName + ',','') 
        + QUOTENAME(id) + 'as ' + QUOTENAME(Months)
-FROM (SELECT DISTINCT sod.CustomerID as id, SUBSTRING(SOD.CustomerName,0, case when CHARINDEX('(', SOD.CustomerName) > 0 then CHARINDEX('(', SOD.CustomerName) else LEN(SOD.CustomerName) end) Months
+FROM (SELECT sod.CustomerID as id, SUBSTRING(SOD.CustomerName,0, case when CHARINDEX('(', SOD.CustomerName) > 0 then CHARINDEX('(', SOD.CustomerName) else LEN(SOD.CustomerName) end) Months
          FROM Sales.Invoices SOH
          JOIN Sales.Customers SOD ON SOH.CustomerID = SOD.CustomerID
     GROUP BY SOD.CustomerName, sod.CustomerID) AS Months
 
+
 SELECT @ColumnName_add= ISNULL(@ColumnName_add + ',','') 
        + QUOTENAME(id)
-FROM (SELECT DISTINCT sod.CustomerID as id, SUBSTRING(SOD.CustomerName,0, case when CHARINDEX('(', SOD.CustomerName) > 0 then CHARINDEX('(', SOD.CustomerName) else LEN(SOD.CustomerName) end) Months
+FROM (SELECT sod.CustomerID as id, SUBSTRING(SOD.CustomerName,0, case when CHARINDEX('(', SOD.CustomerName) > 0 then CHARINDEX('(', SOD.CustomerName) else LEN(SOD.CustomerName) end) Months
          FROM Sales.Invoices SOH
          JOIN Sales.Customers SOD ON SOH.CustomerID = SOD.CustomerID
     GROUP BY SOD.CustomerName, sod.CustomerID) AS Months
+
 
 SELECT @ColumnName as ColumnName 
 SELECT @ColumnName_add as ColumnName_add
 
+
+
 SET @dml = 
-  N'SELECT InvoiceDate, ' +@ColumnName + ' FROM
+  N'SELECT format(InvoiceDate, ''d'', ''de-de'') as date, ' +@ColumnName + ' FROM
   (
   SELECT InvoiceID, DATETRUNC(month,InvoiceDate) AS  InvoiceDate, si.CustomerID
    FROM sales.invoices si
