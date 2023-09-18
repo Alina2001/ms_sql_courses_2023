@@ -2,38 +2,38 @@
 
 -- категория товара
 create table category (
-	id_1 int,
+	id_1 int not null identity(1, 1) primary key,
 	name_category varchar(MAX)
 );
 
 -- подкатегория
 create table category_group (
-	id_2 int,
+	id_2 int not null identity(1, 1) primary key,
 	name_category_group varchar(MAX)
 );
 
 -- товар
 create table goods (
-	id_3 int,
+	id_3 int not null identity(1, 1) primary key,
 	name_goods varchar(MAX)
 );
 
 -- поставщик
 create table supliers (
-	id_4 int,
+	id_4 int not null identity(1, 1) primary key,
 	name_supplier varchar(MAX)
 );
 
 --склад \\ дата прибытия или убытия товара
 create table warehouse_history (
-	id_goods int,
+	id_goods int not null identity(1, 1) primary key,
 	quantiry int,
 	date_delivered date
 );
 
 -- продавцы
 create table sellers (
-	id_5 int,
+	id_5 int not null identity(1, 1) primary key,
 	name_surname varchar(MAX),
 	pasport int,
 	data_come date,
