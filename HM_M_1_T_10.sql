@@ -44,21 +44,31 @@ InvoiceMonth | Aakriti Byrraju    | Abel Spirlea       | Abel Tatarescu | ... (Ð
 DECLARE @dml AS NVARCHAR(MAX)
 DECLARE @ColumnName AS NVARCHAR(MAX)
 DECLARE @ColumnName_add AS NVARCHAR(MAX)
- 
+ /*
 SELECT @ColumnName= ISNULL(@ColumnName + ',','') 
        + QUOTENAME(id) + 'as ' + QUOTENAME(Months)
 FROM (SELECT sod.CustomerID as id, SUBSTRING(SOD.CustomerName,0, case when CHARINDEX('(', SOD.CustomerName) > 0 then CHARINDEX('(', SOD.CustomerName) else LEN(SOD.CustomerName) end) Months
          FROM Sales.Invoices SOH
          JOIN Sales.Customers SOD ON SOH.CustomerID = SOD.CustomerID
     GROUP BY SOD.CustomerName, sod.CustomerID) AS Months
+*/
+SELECT @ColumnName= ISNULL(@ColumnName + ',','') 
+       + QUOTENAME(id) + 'as ' + QUOTENAME(CustomerName)
+FROM ( select CustomerName, CustomerID as id from Sales.Customers
+) as temp
 
+select @ColumnName_add= ISNULL(@ColumnName_add + ',','') 
+       + QUOTENAME(id) FROM (select distinct CustomerID as id from Sales.Invoices) as temp
 
-SELECT @ColumnName_add= ISNULL(@ColumnName_add + ',','') 
+/*
+ISNULL(@ColumnName_add + ',','') 
        + QUOTENAME(id)
 FROM (SELECT sod.CustomerID as id, SUBSTRING(SOD.CustomerName,0, case when CHARINDEX('(', SOD.CustomerName) > 0 then CHARINDEX('(', SOD.CustomerName) else LEN(SOD.CustomerName) end) Months
          FROM Sales.Invoices SOH
          JOIN Sales.Customers SOD ON SOH.CustomerID = SOD.CustomerID
     GROUP BY SOD.CustomerName, sod.CustomerID) AS Months
+*/
+
 
 
 SELECT @ColumnName as ColumnName 
