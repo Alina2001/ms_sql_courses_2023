@@ -11,7 +11,7 @@ create table goods (
 -- Название товаров только с большой буквы
 ALTER TABLE goods 
 	ADD CONSTRAINT check_name_goods 
-		CHECK (SUBSTRING(name_goods, 1, 1) >= 'A' && SUBSTRING(name_goods, 1, 1) <= 'Z');
+		CHECK (SUBSTRING(name_goods, 1, 1) >= 'A' and SUBSTRING(name_goods, 1, 1) <= 'Z');
 
 -- поставщик
 create table supliers (
@@ -22,7 +22,7 @@ create table supliers (
 -- Название постащика только с большой буквы
 ALTER TABLE supliers 
 	ADD CONSTRAINT check_name_supliers
-		CHECK (SUBSTRING(name_supplier, 1, 1) >= 'A' && SUBSTRING(name_supplier, 1, 1) <= 'Z');
+		CHECK (SUBSTRING(name_supplier, 1, 1) >= 'A' and SUBSTRING(name_supplier, 1, 1) <= 'Z');
 
 --склад \\ дата прибытия или убытия товара
 create table warehouse_history (
@@ -48,7 +48,7 @@ create table sellers (
 -- Название продавца только с большой буквы
 ALTER TABLE sellers 
 	ADD CONSTRAINT check_name_supliers
-		CHECK (SUBSTRING(name_surname, 1, 1) >= 'A' && SUBSTRING(name_surname, 1, 1) <= 'Z');
+		CHECK (SUBSTRING(name_surname, 1, 1) >= 'A' and SUBSTRING(name_surname, 1, 1) <= 'Z');
 
 -- товар - продавец
 create table goods_supliers (
@@ -79,10 +79,4 @@ ALTER TABLE sales
 	ADD CONSTRAINT check_price_sales
 		CHECK (price > 0);
 
--- установление связи
-ALTER TABLE vebinar  ADD  CONSTRAINT FK_v_st FOREIGN KEY(id_s)
-REFERENCES student (id)
-ON UPDATE CASCADE
-
-
-create index idx_fio_seller on sellers (name_surname);
+create index idx_fio_seller on sellers (id_5);
