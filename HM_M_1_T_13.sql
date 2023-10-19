@@ -44,7 +44,7 @@ BEGIN
 
 	select i.CustomerID, sum(UnitPrice) from Sales.InvoiceLines as il
 	join Sales.Invoices as i on il.InvoiceID = i.InvoiceID
-	where  i.CustomerID = '1'
+	where  i.CustomerID = @customerID
 	group by i.CustomerID
 END
 GO
